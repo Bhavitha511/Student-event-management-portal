@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .register-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  background: #3f51b5;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.register-btn:hover {
+  background: #2c3e91;
+}
+
+  .event-detail-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .event-title {
+    font-size: 2rem;
+    color: #003366;
+    margin-bottom: 0.5rem;
+  }
+
+  .event-meta {
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .section {
+    margin-top: 2rem;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9fbfe;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    font-weight: bold;
+    color: #003366;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .section-heading .btn {
+    background-color: #007bff;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .media-card {
+    background: #f1f6fd;
+    border-left: 4px solid #007bff;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+  }
+
+  .media-card strong {
+    color: #003366;
+  }
+
+  .media-card a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .media-card a:hover {
+    text-decoration: underline;
+  }
+
+  .announcement {
+    background: #f0f4ff;
+    border-left: 4px solid #3366cc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .announcement strong {
+    color: #1a237e;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .announcement small {
+    display: block;
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 0.4rem;
+  }
+</style>
+
+<div class="event-detail-container">
+  <div class="event-title">{{ event.title }}</div>
+  <div class="event-meta">
+    <strong>Date:</strong> {{ event.event_date }}<br>
+    <strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}<br>
+    <strong>Location:</strong> {{ event.location }}
+  </div>
+
+  <div>{{ event.description }}</div>
+
+  <!-- MEDIA SECTION -->
+  <div class="section">
+    <div class="section-heading">
+      <h2>📁 Media for "{{ event.title }}"</h2>
+      {% if request.user.is_superuser %}
+        <a href="{% url 'upload_media' event.id %}" class="btn">+ Upload</a>
+      {% endif %}
+    </div>
+
+    {% if media %}
+      {% for item in media %}
+        <div class="media-card">
+          <div><strong>{{ item.media_type|title }}</strong> - <a href="{{ item.file_path }}" target="_blank">{{ item.file_path }}</a></div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No media uploaded yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- ANNOUNCEMENT SECTION -->
+  <div class="section">
+    <div class="section-heading">
+      <h2>📢 Announcements</h2>
+      {% if request.user.is_superuser %}
+        <a href="{% url 'create_announcement' event.id %}" class="btn">+ Add Announcement</a>
+      {% endif %}
+    </div>
+
+    {% if announcements %}
+      {% for a in announcements %}
+        <div class="announcement">
+          <strong>{{ a.title }}</strong>
+          {{ a.message }}
+          <small>Posted on {{ a.created_at|date:"F j, Y, g:i a" }}</small>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No announcements posted yet.</p>
+    {% endif %}
+  </div>
+  {% if event.event_date <= today and request.user.is_authenticated %}
+  {% if not feedback_submitted %}
+    <a href="{% url 'submit_feedback' event.id %}" class="register-btn" style="margin-top: 2rem;">📝 Give Feedback</a>
+  {% else %}
+    <p style="margin-top: 1rem; color: #28a745;">✅ You have submitted feedback for this event.</p>
+  {% endif %}
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .create-event-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    background-color: #ffffff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .create-event-container h2 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 1.8rem;
+    font-size: 1.75rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #003366;
+    outline: none;
+  }
+
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background-color: #0055aa;
+  }
+
+  .error-msg {
+    color: red;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+</style>
+
+<div class="create-event-container">
+  <h2>Add New Category</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}
+          <div class="error-msg">{{ field.errors|striptags }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="submit-btn" type="submit">Create Category</button>
+  </form>
+</div>
+{% endblock %}

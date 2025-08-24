@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .metrics-container {
+    max-width: 700px;
+    margin: 3rem auto;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .metrics-title {
+    font-size: 2rem;
+    color: #003366;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .metrics-list {
+    list-style: none;
+    padding: 0;
+    font-size: 1.1rem;
+  }
+
+  .metrics-list li {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #e6e6e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .metrics-list li:last-child {
+    border-bottom: none;
+  }
+
+  .metrics-label {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .metrics-value {
+    color: #007bff;
+    font-weight: bold;
+  }
+</style>
+
+<div class="metrics-container">
+  <div class="metrics-title">📊 Metrics for "{{ event.title }}"</div>
+  <ul class="metrics-list">
+    <li><span class="metrics-label">Views:</span> <span class="metrics-value">{{ metrics.views }}</span></li>
+    <li><span class="metrics-label">Registrations:</span> <span class="metrics-value">{{ metrics.registrations }}</span></li>
+    <li><span class="metrics-label">Attendance:</span> <span class="metrics-value">{{ metrics.attendance_count }}</span></li>
+    <li><span class="metrics-label">Feedbacks:</span> <span class="metrics-value">{{ metrics.feedback_count }}</span></li>
+  </ul>
+</div>
+{% endblock %}

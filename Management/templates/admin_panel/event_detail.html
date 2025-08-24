@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block start %}
+<div style="max-width: 900px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 12px;">
+  <h2 style="color: #003366;">📄 Event: {{ event.title }}</h2>
+
+  <p><strong>Date:</strong> {{ event.event_date }}</p>
+  <p><strong>Time:</strong> {{ event.start_time }} – {{ event.end_time }}</p>
+  <p><strong>Location:</strong> {{ event.location }}</p>
+  <p><strong>Description:</strong> {{ event.description }}</p>
+
+  <hr style="margin: 2rem 0;">
+
+  <h3 style="color: #003366;">👥 Registered Users ({{ registrations.count }})</h3>
+  {% if registrations %}
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #f1f6fd;">
+          <th style="padding: 0.6rem; text-align: left;">Username</th>
+          <th style="padding: 0.6rem; text-align: left;">Email</th>
+          <th style="padding: 0.6rem; text-align: left;">Registered On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 0.6rem;">{{ reg.user.username }}</td>
+          <td style="padding: 0.6rem;">{{ reg.user.email }}</td>
+          <td style="padding: 0.6rem;">{{ reg.registration_date|date:"M d, Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No users registered yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

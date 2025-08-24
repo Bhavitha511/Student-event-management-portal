@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .announcement-form-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    background-color: #ffffff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .announcement-form-container h2 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  form p {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  textarea {
+    min-height: 120px;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #003366;
+  }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #0055aa;
+  }
+</style>
+
+<div class="announcement-form-container">
+  <h2>Create Announcement for "{{ event.title }}"</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post Announcement</button>
+  </form>
+</div>
+{% endblock %}

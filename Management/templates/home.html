@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block start %}
+<style>
+  .announcement-box {
+    background: #f1f6fd;
+    border-left: 5px solid #007bff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+  }
+
+  .announcement-box h3 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: #003366;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .announcement-box ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .announcement-box li {
+    background: white;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.7rem;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+    font-size: 0.95rem;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .announcement-box li strong {
+    color: #0055aa;
+  }
+</style>
+
+<div class="announcement-box">
+  <h3>📣 Latest Announcements</h3>
+  <ul>
+    {% for ann in announcements %}
+      <li><strong>{{ ann.title }}</strong>: {{ ann.message }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<section class="hero">
+
+  {% if user.is_authenticated %}
+  <div class="welcome-container">
+    <h1>Welcome, {{ user.first_name|default:user.username }}! 👋</h1>
+    <p>This is your personalized dashboard. Explore events, manage your registrations, and stay updated.</p>
+
+    <div class="dashboard-links">
+      <div class="card">
+        <h3>🎉 Browse Events</h3>
+        <p>View all upcoming college events and register for your favorites.</p>
+        <a href="{% url 'event_list' %}">View Events</a>
+      </div>
+
+      <div class="card">
+        <h3>📝 My Registrations</h3>
+        <p>See the events you've registered for and track your participation.</p>
+        <a href="{% url 'user_dashboard' %}">My Dashboard</a>
+      </div>
+
+      <div class="card">
+        <h3>📬 Contact Team</h3>
+        <p>Reach out to our support team or send feedback/suggestions.</p>
+        <a href="{% url 'contact' %}">Contact Us</a>
+      </div>
+
+      {% if user.is_superuser %}
+      <div class="card">
+        <h3>🛠 Admin Panel</h3>
+        <p>Manage events, view registrations and announcements.</p>
+        <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="welcome-container" style="text-align:center;">
+    <h1>Welcome to the Student Event Management Portal</h1>
+    <p>Your one-stop platform for discovering, organizing, and participating in college events. Stay connected with your academic community.</p>
+    <a href="{% url 'register' %}" class="get-started-btn">Get Started</a>
+  </div>
+  {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,317 @@
+<!-- templates/events/event_list.html -->
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .events-wrapper {
+    padding: 2rem;
+    background-color: #f9f9f9;
+  }
+
+  .events-header {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #222;
+  }
+
+  .filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .filters input,
+  .filters select {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    min-width: 200px;
+  }
+
+  .event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .event-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  .event-category {
+    color: #556cd6;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .event-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0.4rem 0;
+    color: #222;
+  }
+
+  .event-info {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 0.4rem;
+  }
+
+  .progress-section {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .progress-bar {
+    background: #eee;
+    border-radius: 6px;
+    height: 8px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    background-color: #4caf50;
+    height: 100%;
+    border-radius: 6px;
+  }
+
+  .register-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    background: #3f51b5;
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .register-btn.disabled {
+    background: #999;
+    pointer-events: none;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+  }
+</style>
+
+
+<div class="events-wrapper">
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+    {% if request.user.is_superuser %}
+      <a href="{% url 'create_event' %}" class="register-btn" style="margin-top: 0;">+ Add Event</a>
+    {% endif %}
+  </div>
+
+  <div class="events-header">Upcoming Events for You</div>
+
+  <form method="get" class="filters">
+  <input type="text" name="search" placeholder="Search events..." value="{{ request.GET.search }}">
+
+  <select name="category">
+    <option value="">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+        {{ cat.category_name }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <select name="date">
+    <option value="">Any Date</option>
+    <option value="today" {% if request.GET.date == 'today' %}selected{% endif %}>Today</option>
+    <option value="upcoming" {% if request.GET.date == 'upcoming' %}selected{% endif %}>Upcoming</option>
+    <option value="past" {% if request.GET.date == 'past' %}selected{% endif %}>Past</option>
+  </select>
+
+  <button type="submit" class="register-btn" style="padding: 0.5rem 1rem;">Search</button>
+</form>
+
+
+  <div class="event-grid">
+    {% for event in events %}
+      <div class="event-card" onclick="showModal({{ event.id }})">
+        <div class="event-category">{{ event.category.category_name }}</div>
+        <div class="event-title">{{ event.title }}</div>
+        <div class="event-info"><i class="fa fa-calendar-alt"></i> {{ event.event_date }} {{ event.start_time }}</div>
+        <div class="event-info"><i class="fa fa-map-marker-alt"></i> {{ event.location }}</div>
+
+        <div class="progress-section">
+          {% if event.spots_left > 0 %}
+            <span style="color:#f57c00;">{{ event.spots_left }} spots left</span>
+          {% else %}
+            <span style="color:red;">Full</span>
+          {% endif %}
+          <span style="color:green;">{{ event.percent_filled }}% filled</span>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:{{ event.percent_filled }}%;"></div>
+        </div>
+
+        <div style="text-align:right;">
+          {% if event.event_date < today %}
+  <span class="register-btn disabled">Closed</span>
+{% elif event.spots_left > 0 %}
+  <a href="{% url 'register_for_event' event.id %}" class="register-btn">Register</a>
+{% else %}
+  <span class="register-btn disabled">Full</span>
+{% endif %}
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <!-- Modal -->
+<div id="modal-{{ event.id }}" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="hideModal({{ event.id }})">&times;</span>
+
+    <h2 style="font-size: 1.5rem; color: #003366;">{{ event.title }}</h2>
+    <p>{{ event.description }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Date:</strong> {{ event.event_date }} {{ event.start_time }} - {{ event.end_time }}</p>
+
+    <!-- Media Section -->
+    <div style="margin-top: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; color: #003366;">Media</h3>
+        {% if request.user.is_superuser %}
+          <a href="{% url 'upload_media' event.id %}" class="register-btn">+ Upload Media</a>
+          <a href="{% url 'event_edit' event.id %}" class="register-btn" style="background: #f57c00;">✏️ Edit Event</a>
+        {% endif %}
+      </div>
+      {% if event.media_set.all %}
+        {% for media in event.media_set.all %}
+          <div style="
+              background: #f1f6fd;
+              border-left: 4px solid #007bff;
+              padding: 0.8rem 1rem;
+              border-radius: 8px;
+              margin: 0.5rem 0;
+              font-size: 0.9rem;">
+            <strong style="color: #003366;">{{ media.media_type|title }}</strong> –
+            <a href="{{ media.file_path }}" target="_blank" style="color:#007bff;">{{ media.file_path }}</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: #666;">No media uploaded.</p>
+      {% endif %}
+    </div>
+
+    <!-- Announcement Section -->
+    <div style="margin-top: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; color: #003366;">Announcements</h3>
+        {% if request.user.is_superuser %}
+          <a href="{% url 'create_announcement' event.id %}" class="register-btn">+ Add Announcement</a>
+        {% endif %}
+      </div>
+      {% if event.announcement_set.all %}
+        {% for ann in event.announcement_set.all %}
+          <div style="
+              background: #e8f0fe;
+              border-left: 4px solid #1a73e8;
+              border-radius: 6px;
+              padding: 0.8rem 1rem;
+              margin: 0.5rem 0;
+              font-size: 0.9rem;">
+            <strong style="color: #1a237e;">{{ ann.title }}</strong>: {{ ann.message }}
+            <div style="font-size: 0.75rem; color: #666; margin-top: 0.4rem;">
+              Posted on {{ ann.created_at|date:"F j, Y, g:i a" }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: #666;">No announcements yet.</p>
+      {% endif %}
+    </div>
+    <!-- Feedback Section -->
+{% if request.user.is_authenticated and event.event_date <= today %}
+  {% if event.id not in given_feedback_event_ids %}
+    <a href="{% url 'submit_feedback' event.id %}" class="register-btn" style="margin-top: 1rem;">📝 Give Feedback</a>
+  {% else %}
+    <p style="margin-top: 1rem; color: #28a745;">✅ Feedback submitted</p>
+  {% endif %}
+{% endif %}
+    <div class="section">
+  <h3>🗣 Feedbacks</h3>
+  {% if event.feedback_set.all %}
+    {% for fb in event.feedback_set.all %}
+      <div style="background: #f9f9f9; padding: 1rem; margin-bottom: 1rem; border-left: 4px solid #3f51b5;">
+        <strong>{{ fb.user.username }}</strong> rated <strong>{{ fb.rating }}/5</strong><br>
+        <em>{{ fb.comments }}</em><br>
+        <small>Submitted on {{ fb.submitted_at|date:"F j, Y, g:i a" }}</small>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No feedback submitted yet.</p>
+  {% endif %}
+</div>
+
+
+  </div>
+</div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function showModal(id) {
+    document.getElementById('modal-' + id).style.display = 'block';
+  }
+  function hideModal(id) {
+    document.getElementById('modal-' + id).style.display = 'none';
+  }
+</script>
+{% endblock %}

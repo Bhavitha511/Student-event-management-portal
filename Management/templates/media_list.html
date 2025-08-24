@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .media-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .media-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .media-header h2 {
+    margin: 0;
+    color: #003366;
+    font-size: 1.8rem;
+  }
+
+  .upload-btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .upload-btn:hover {
+    background-color: #0056b3;
+  }
+
+  .media-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .media-item {
+    background-color: #f7f9fc;
+    border-left: 4px solid #1a73e8;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .media-item strong {
+    color: #1a237e;
+    margin-right: 10px;
+  }
+
+  .media-item a {
+    color: #0055aa;
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .media-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="media-container">
+  <div class="media-header">
+    <h2>🖼 Media for "{{ event.title }}"</h2>
+    <a href="{% url 'upload_media' event.id %}" class="upload-btn">+ Upload</a>
+  </div>
+
+  {% if media %}
+    <ul class="media-list">
+      {% for item in media %}
+        <li class="media-item">
+          <strong>{{ item.media_type|title }}</strong> -
+          <a href="{{ item.file_path }}" target="_blank">{{ item.file_path }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No media uploaded yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

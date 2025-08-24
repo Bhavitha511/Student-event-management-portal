@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .dashboard-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  .dashboard-header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #003366;
+    margin-bottom: 1.5rem;
+  }
+
+  .user-info {
+    background: #f1f6fd;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .user-info p {
+    margin: 0.4rem 0;
+    font-size: 1rem;
+  }
+
+  .event-card {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-left: 4px solid #3f51b5;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  .event-card h4 {
+    margin: 0;
+    color: #003366;
+  }
+
+  .event-card a {
+    color: #007bff;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .event-card a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="dashboard-container">
+  <div class="dashboard-header">👤 Your Dashboard</div>
+
+  <div class="user-info">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Phone:</strong> {{ user.phone }}</p>
+  </div>
+
+  <h3>📅 Registered Events</h3>
+  {% if registrations %}
+    {% for reg in registrations %}
+      <div class="event-card">
+        <h4>{{ reg.event.title }}</h4>
+        <p>Date: {{ reg.event.event_date }} | Location: {{ reg.event.location }}</p>
+        <p><a href="{% url 'event_detail' reg.event.id %}">🔍 View Event Details</a></p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>You have not registered for any events yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

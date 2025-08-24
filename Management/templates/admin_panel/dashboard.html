@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block start %}
+<div style="max-width: 800px; margin: 2rem auto; padding: 1.5rem; background: white; border-radius: 10px;">
+  <h2 style="color: #003366;">📋 Admin Dashboard – All Events</h2>
+  <ul style="list-style: none; padding-left: 0;">
+    {% for event in events %}
+      <li style="margin-bottom: 1rem; padding: 1rem; border-left: 4px solid #007bff; background: #f9f9f9; border-radius: 6px;">
+        <a href="{% url 'admin_event_detail' event.id %}" style="font-size: 1.1rem; font-weight: bold; color: #007bff; text-decoration: none;">
+          {{ event.title }}
+        </a>
+        <p style="margin: 0.3rem 0;"><strong>Date:</strong> {{ event.event_date }} | <strong>Location:</strong> {{ event.location }}</p>
+      </li>
+    {% empty %}
+      <li>No events found.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

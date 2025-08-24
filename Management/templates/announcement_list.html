@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block start %}
+<style>
+  .announcements-container {
+    max-width: 800px;
+    margin: 3rem auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .announcements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .announcements-header h2 {
+    color: #003366;
+    font-size: 1.8rem;
+    margin: 0;
+  }
+
+  .create-btn {
+    background: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .create-btn:hover {
+    background: #0056b3;
+  }
+
+  .announcement-item {
+    background: #f1f6ff;
+    border-left: 4px solid #1a73e8;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+
+  .announcement-item strong {
+    display: block;
+    font-size: 1.1rem;
+    color: #1a237e;
+    margin-bottom: 0.3rem;
+  }
+
+  .announcement-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+</style>
+
+<div class="announcements-container">
+  <div class="announcements-header">
+    <h2>📣 Announcements for "{{ event.title }}"</h2>
+    <a href="{% url 'create_announcement' event.id %}" class="create-btn">+ Create</a>
+  </div>
+
+  {% if announcements %}
+    {% for announcement in announcements %}
+      <div class="announcement-item">
+        <strong>{{ announcement.title }}</strong>
+        <p>{{ announcement.message }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No announcements posted yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
